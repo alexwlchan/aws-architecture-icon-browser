@@ -84,13 +84,17 @@ def assets_by_size(assets):
     #     Res_AWS-App-Mesh-Mesh_48_Light.png
     #
     assets_by_size = {
-        path: int(filename.replace("_Light", "").replace("_Dark", "").split("_")[-1].split(".")[0].replace("64@5x", "320"))
+        path: int(
+            filename.replace("_Light", "")
+            .replace("_Dark", "")
+            .split("_")[-1]
+            .split(".")[0]
+            .replace("64@5x", "320")
+        )
         for path, filename in asset_filenames.items()
     }
 
-    return sorted(
-        assets_by_size, key=lambda path: assets_by_size[path], reverse=True
-    )
+    return sorted(assets_by_size, key=lambda path: assets_by_size[path], reverse=True)
 
 
 @app.template_filter("highest_res")
@@ -110,7 +114,13 @@ def index():
     resource_icons = collections.defaultdict(list)
 
     for p in paths:
-        name = os.path.basename(p).replace("_Light", "").replace("_Dark", "").rsplit("_", 1)[0].replace("-", " ")
+        name = (
+            os.path.basename(p)
+            .replace("_Light", "")
+            .replace("_Dark", "")
+            .rsplit("_", 1)[0]
+            .replace("-", " ")
+        )
 
         if "/Architecture-" in p:
             architecture_icons[name.replace("Arch_", "")].append(p)
@@ -121,7 +131,13 @@ def index():
         if "/Resource-" in p:
             resource_icons[name.replace("Res_", "").replace("_", ": ")].append(p)
 
-    return render_template("index.html", paths=paths, architecture_icons=architecture_icons, category_icons=category_icons, resource_icons=resource_icons)
+    return render_template(
+        "index.html",
+        paths=paths,
+        architecture_icons=architecture_icons,
+        category_icons=category_icons,
+        resource_icons=resource_icons,
+    )
 
 
 @app.route("/<path:path>")
@@ -149,21 +165,17 @@ def choose_color_from_path(assets):
         for hs in hex_strings
     }
 
-    colors_to_hls = {
-        (r, g, b): colorsys.rgb_to_hls(r, g, b)
-        for (r, g, b) in colors
-    }
+    colors_to_hls = {(r, g, b): colorsys.rgb_to_hls(r, g, b) for (r, g, b) in colors}
 
     # Remove any colors which are too light to have sufficient contrast
     usable_colors = {
-        (r, g, b): (h, l, s)
-        for (r, g, b), (h, l, s) in colors_to_hls.items() if l <= 0.8
+        (r, g, b): (h, lightness, s)
+        for (r, g, b), (h, lightness, s) in colors_to_hls.items()
+        if lightness <= 0.8
     }
 
     try:
-        most_saturated_color = max(
-            usable_colors, key=lambda c: usable_colors[c][2]
-        )
+        most_saturated_color = max(usable_colors, key=lambda c: usable_colors[c][2])
     except ValueError:
         # no usable color, just use black
         return "#000"
@@ -171,9 +183,7 @@ def choose_color_from_path(assets):
     return colors[most_saturated_color]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asset_package_dirname = ensure_asset_package_downloaded()
-
-
 
     app.run(debug=True, port=2520)

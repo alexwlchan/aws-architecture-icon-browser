@@ -25,3 +25,28 @@ I made this app
 
 
 ## Usage
+
+This tool needs Python 3.
+To install and run it:
+
+```
+# Clone the repo
+git clone https://github.com/alexwlchan/aws-architecture-icon-browser.git
+cd aws-architecture-icon-browser
+
+# Install requirements
+pip3 install -r requirements.txt
+
+# Run the app
+python3 viewer.py
+```
+
+The app will automatically download a copy of the AWS Architecture Icons to your computer, then you'll then see the app running at <http://localhost:2520>.
+
+I did consider providing a hosted version, but I'm not sure if anybody else will even find this useful – and there might be copyright issues I don't want to think about right now.
+
+
+
+## License
+
+MIT.
