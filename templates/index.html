@@ -1,0 +1,147 @@
+<title>AWS Architecture icon browser</title>
+
+<style>
+  body {
+    max-width: 700px;
+    margin-left:  auto;
+    margin-right: auto;
+    font-family: sans-serif;
+  }
+
+  img {
+    max-width: 48px;
+  }
+
+  li.icon {
+    display: grid;
+    grid-template-columns: 60px auto;
+    vertical-align: middle;
+  }
+
+  li:not(:last-child) {
+    margin-top: 5px;
+  }
+
+  .name {
+    margin-top:    auto;
+    margin-bottom: auto;
+  }
+
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  ul.asset_links li {
+    display: inline;
+    font-size: small;
+  }
+
+  ul.asset_links li:not(:first-child)::before {
+    content: " · ";
+  }
+
+  a:hover {
+    text-decoration: none;
+  }
+
+  .dark_backdrop {
+    display: inline-block;
+    height: 48px;
+    background: #222;
+    width: 48px;
+  }
+
+  form, input {
+    font-size: large;
+  }
+
+  form {
+    margin-top: 1em;
+  }
+
+  form a {
+    color: black;
+  }
+</style>
+
+<form>
+  <script>
+    function matchesFilter(iconName, input) {
+      var tokens = input.toLowerCase().split(" ");
+      var lowercaseName = iconName.toLowerCase();
+
+      console.log(tokens);
+
+      for (t = 0; t < tokens.length; t++) {
+        console.log(tokens[t]);
+        // console.log(lowercaseName + " " + tokens[t] + " " + lowercaseName.includes(tokens[t]));
+        if (!lowercaseName.includes(tokens[t])) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    function applyFilter() {
+      var input = document.getElementsByName("filterIcons")[0].value;
+
+      var icons = document.getElementsByClassName("icon");
+      for (i = 0; i < icons.length; i++) {
+        var iconName = icons[i].getAttribute("data-name");
+
+        if (matchesFilter(iconName, input)) {
+          icons[i].style.display = "grid";
+        } else {
+          icons[i].style.display = "none";
+        }
+      }
+    }
+  </script>
+
+  <p>A browser for the <a href="https://aws.amazon.com/architecture/icons/">AWS Architecture Icons</a>.</p>
+
+  <label for="filterIcons">filter icons:</label>
+  <input type="text" name="filterIcons" oninput="script:applyFilter()"></input>
+</form>
+
+<hr/>
+
+{% for title, icon_collection in [
+  ("Architecture", architecture_icons),
+  ("Category", category_icons),
+  ("Resource", resource_icons)
+] %}
+  <h1>{{ title }}</h1>
+
+  <ul>
+  {% for name, assets in icon_collection.items()|sort %}
+    <style>
+      li[data-name="{{ name }}"] a {
+        color: {{ assets|tint_color }};
+      }
+    </style>
+
+    <li class="icon" data-name="{{ name }}">
+      {% if assets|tint_color == "#000" %}
+        <!-- This is a fully white icon, so throw in a black backdrop -->
+        <div class="dark_backdrop">
+      {% endif %}
+      <img src="{{ assets|highest_res }}">
+      {% if assets|tint_color == "#000" %}
+        </div>
+      {% endif %}
+
+      <div class="name">
+        {{ name }}
+        <ul class="asset_links">
+          {% for a in assets|by_size %}
+            <li><a href="{{ a }}">{{ a|description }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </li>
+  {% endfor %}
+  </ul>
+{% endfor %}
