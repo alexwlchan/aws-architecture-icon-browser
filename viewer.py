@@ -7,7 +7,7 @@ import re
 import urllib.request
 import zipfile
 
-from flask import Flask, render_template, send_file
+from flask import abort, Flask, render_template, send_file
 
 
 # From https://aws.amazon.com/architecture/icons/
@@ -29,8 +29,8 @@ def ensure_asset_package_downloaded():
         return asset_package_dirname
 
     filename = os.path.basename(ASSET_PACKAGE_URL)
-    urllib.request.urlretrieve(ASSET_PACKAGE_URL, filename)
     print(f"Downloading asset package to {filename}")
+    urllib.request.urlretrieve(ASSET_PACKAGE_URL, filename)
 
     with zipfile.ZipFile(filename) as zf:
         zf.extractall()
@@ -143,8 +143,10 @@ def index():
 
 @app.route("/<path:path>")
 def serve_asset(path):
-    assert path.startswith("Asset-Package_")
-    return send_file(path)
+    if path.startswith("Asset-Package_"):
+        return send_file(path)
+    else:
+        return abort(404)
 
 
 @app.template_filter("tint_color")
