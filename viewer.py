@@ -30,6 +30,7 @@ def ensure_asset_package_downloaded():
 
     filename = os.path.basename(ASSET_PACKAGE_URL)
     urllib.request.urlretrieve(ASSET_PACKAGE_URL, filename)
+    print(f"Downloading asset package to {filename}")
 
     with zipfile.ZipFile(filename) as zf:
         zf.extractall()
