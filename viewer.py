@@ -95,6 +95,10 @@ def assets_by_size(assets):
         for path, filename in asset_filenames.items()
     }
 
+    for path in assets_by_size:
+        if path.endswith(".svg"):
+            assets_by_size[path] += 1
+
     return sorted(assets_by_size, key=lambda path: assets_by_size[path], reverse=True)
 
 
